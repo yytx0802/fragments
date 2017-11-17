@@ -1,5 +1,6 @@
 //port handling on Linux (for ROS)
 
+
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -177,13 +178,13 @@ int main()
     {
         while((nread = read(fd, buff, 512))>0)
         {
-            printf("\nLen %d\n",nread);
+            //printf("\nLen %d\n",nread);
             //buff[nread+1] = '\0';
-            printf( "buff is     :%s", buff);
+            printf( "%s", buff);
             memset( buff, 0, 512 );
-            usleep(200000);
+            //usleep(200000);
             nwrite = write(fd, sendbuff, strlen(sendbuff));
-            printf("\nwrite Len %d\n",nwrite);
+            //printf("\nwrite Len %d\n",nwrite);
             usleep(200000);
 
         }
