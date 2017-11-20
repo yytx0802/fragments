@@ -197,7 +197,6 @@ int main(int argc, char **argv)
             nwrite = write(fd, sendbuff, strlen(sendbuff));	    
             ros::spinOnce();
             loop_rate.sleep();		//0.1s
-	      //ros::spin();
         }
         //usleep(100000);
     }
