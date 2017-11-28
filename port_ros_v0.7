@@ -21,8 +21,7 @@ char sendbuff[100] = "0,0,0\r\n";
 class Controller{
     public:
     int fd = 0;
-    int i;
-    
+    int i; 
     int set_opt(int fd,int nSpeed, int nBits, char nEvent, int nStop);
     int open_port(int fd,int comport);
     void chatterCallback(const geometry_msgs::Twist& vel);
