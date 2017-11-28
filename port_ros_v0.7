@@ -225,11 +225,6 @@ int main(int argc, char **argv)
         ros::Publisher cmd_pub = n.advertise<nav_msgs::Odometry>("command", 10);
 	tf::TransformBroadcaster odom_broadcaster;
 
-	ros::Time current_time, last_time;
-	current_time = ros::Time::now();
-	last_time = ros::Time::now();
-
-	double dt;
 	double x = 0.0;
 	double y = 0.0;
 	double th = 0.0;
@@ -238,16 +233,21 @@ int main(int argc, char **argv)
 	double vy = -0.1;
 	double vth = 0.1;
 
+	double dt;
 	double delta_x;
 	double delta_y;
 	double delta_th;
+
+	ros::Time current_time, last_time;
+	current_time = ros::Time::now();
+	last_time = ros::Time::now();
 
 	while (ros::ok()) //循环读取数据
 	{
 		while((nread = read(C.fd, buff, 512))>0)		//read from st
 		{
 			//printf( "%s", buff);
-
+			current_time = ros::Time::now();
 			sscanf(buff, "%lf, %lf, %lf", &x, &y, &th);					//x, y,th
 			dt = (current_time - last_time).toSec();			//still needs consideration
 			delta_x = (vx * cos(th) - vy * sin(th)) * dt;
@@ -290,6 +290,7 @@ int main(int argc, char **argv)
 			std::string str(buff);
 			msg.data = str;
 			cmd_pub.publish(odom);				//publish info to the "command" topic
+			last_time = current_time;
 			memset( buff, 0, 512 );
 
 			ros::spinOnce();					//subscribe info is triggerred in callback
