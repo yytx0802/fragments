@@ -227,7 +227,7 @@ int main(int argc, char **argv)
         ros::Publisher cmd_pub = n.advertise<std_msgs::String>("command", 10);
 	while (ros::ok()) //循环读取数据
 	{
-	    while((nread = read(C.fd, buff, 512))>0)		//read from st
+	    if((nread = read(C.fd, buff, 512))>0)		//read from st
 	    {
 		printf( "%s", buff);
 	        std::string str(buff);
