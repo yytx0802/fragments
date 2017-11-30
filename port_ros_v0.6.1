@@ -19,14 +19,13 @@ char sendbuff[100] = "0,0,0\r\n";
 class Controller{
     public:
     int fd = 0;
-    int i;
-    
+    int i; 
     int set_opt(int fd,int nSpeed, int nBits, char nEvent, int nStop);
     int open_port(int fd,int comport,char* port_name);
     void chatterCallback(const geometry_msgs::Twist& vel);
-    void connectPort(char* port_name);
-    Controller(char* port_name){
-	connectPort(port_name);
+    void connectPort(char* port_name,double baud_rate);
+    Controller(char* port_name,double baud_rate){
+	connectPort(port_name,baud_rate);
     }
 
 };
@@ -119,7 +118,6 @@ switch( nSpeed )
 int Controller::open_port(int fd,int comport,char* port_name)
 {
     //char *dev[]={"/dev/ttyACM0","/dev/ttyUSB0","/dev/ttyS2"};
-    //long  vdisable;
     if (comport==1)
     {    fd = open( port_name, O_RDWR|O_NOCTTY|O_NDELAY);
         if (-1 == fd)
@@ -177,34 +175,34 @@ int Controller::open_port(int fd,int comport,char* port_name)
     return fd;
 }
 
-void Controller::chatterCallback(const geometry_msgs::Twist& vel)
-{
-    //geometry_msgs::Twist new_vel = *vel;
-    std::stringstream ss;
-    //ss << "hello world again" << count;
-    ss <<vel.linear.x<<","<<vel.linear.y<<","<<vel.angular.z;
-  //ROS_INFO("I heard: [%s]", msg->data.c_str());
-  //write(fd, msg->data.c_str(), strlen(msg->data.c_str()));
-  strcpy(sendbuff, ss.str().c_str());
-  int temp = strlen(sendbuff);
-  sendbuff[temp] = '\r';
-  sendbuff[temp+1] = '\n';
-  sendbuff[temp+2] = '\0';
-  std::cout << "buffer is "<< sendbuff << std::endl;
-}
-
-void Controller::connectPort(char* port_name){
+void Controller::connectPort(char* port_name,double baud_rate){
     if((fd=open_port(fd,1,port_name))<0)
     {
         perror("open_port error");
         return;
     }
-    if((i=set_opt(fd,115200,8,'N',1))<0)
+    if((i=set_opt(fd,baud_rate,8,'N',1))<0)
     {
         perror("set_opt error");
         return;
     }
     printf("fd=%d\n",fd);
+}
+
+void Controller::chatterCallback(const geometry_msgs::Twist& vel)
+{
+
+	std::stringstream ss;
+	//ss << "hello world again" << count;
+	ss <<vel.linear.x<<","<<vel.linear.y<<","<<vel.angular.z;
+	//ROS_INFO("I heard: [%s]", msg->data.c_str());
+	//write(fd, msg->data.c_str(), strlen(msg->data.c_str()));
+	strcpy(sendbuff, ss.str().c_str());
+	int temp = strlen(sendbuff);
+	sendbuff[temp] = '\r';
+	sendbuff[temp+1] = '\n';
+	sendbuff[temp+2] = '\0';
+	std::cout << "buffer is "<< sendbuff << std::endl;
 }
 
 int main(int argc, char **argv)
@@ -213,14 +211,18 @@ int main(int argc, char **argv)
         int nread,nwrite;
         char  buff[512];
 	char port_name[20];
+	int baud_rate;
         std_msgs::String msg;
 	std::string s;
+
         ros::NodeHandle n;
 	n.param<std::string>("port_name", s, "/dev/ttyACM0");
+	n.param("baud_rate", baud_rate, 115200);
+
 	strcpy(port_name, s.c_str());
         ros::Rate loop_rate(4);
 
-	Controller C(port_name);
+	Controller C(port_name,baud_rate);
         ros::Subscriber sub = n.subscribe("cmd_vel", 10, &Controller::chatterCallback,&C);
         ros::Publisher cmd_pub = n.advertise<std_msgs::String>("command", 10);
 	while (ros::ok()) //循环读取数据
@@ -237,7 +239,6 @@ int main(int argc, char **argv)
 		loop_rate.sleep();		//0.1s
 		nwrite = write(C.fd, sendbuff, strlen(sendbuff));	//write to st
 	    }
-	    	//ROS_INFO("WTF??");
 	}
 	ROS_INFO("WTF!!");
 	close(C.fd);
