@@ -197,13 +197,10 @@ void Controller::chatterCallback(const geometry_msgs::Twist& vel)
 	std::stringstream ss;
 	//ss << "hello world again" << count;
 	ss <<vel.linear.x<<","<<vel.linear.y<<","<<vel.angular.z;
-	//ROS_INFO("I heard: [%s]", msg->data.c_str());
-	//write(fd, msg->data.c_str(), strlen(msg->data.c_str()));
 	strcpy(sendbuff, ss.str().c_str());
 	int temp = strlen(sendbuff);
 	sendbuff[temp] = '\r';
 	sendbuff[temp+1] = '\n';
-	sendbuff[temp+2] = '\0';
 	//std::cout << "buffer is "<< sendbuff << std::endl;
 }
 
@@ -211,7 +208,7 @@ int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "listener");
         int nread,nwrite;
-        char  buff[512];
+        char  buff[100];
 	char port_name[20];
 	int baud_rate;
         std_msgs::String msg;
@@ -233,8 +230,9 @@ int main(int argc, char **argv)
 	n.param("baud_rate", baud_rate, 115200);
 
 	strcpy(port_name, s.c_str());
-        ros::Rate loop_rate(4);
-
+        ros::Rate loop_rate(10);
+	current_time = ros::Time::now();
+	last_time = ros::Time::now();
 	Controller C(port_name,baud_rate);
 	geometry_msgs::TransformStamped odom_trans;
 	tf::TransformBroadcaster odom_broadcaster;
@@ -242,15 +240,17 @@ int main(int argc, char **argv)
         ros::Publisher cmd_pub = n.advertise<nav_msgs::Odometry>("command", 10);
 	while (ros::ok()) //循环读取数据
 	{
-	    if((nread = read(C.fd, buff, 512))>2)		//read from st
+	    if((nread = read(C.fd, buff, 100))>2)		//read from st
 	    {
 		printf( "%s", buff);
 		current_time = ros::Time::now();
 		sscanf(buff, "%f, %f, %f", &x, &y, &th);					//x, y,th
-		dt = (current_time - last_time).toSec();			//still needs consideration
+		dt = (current_time - last_time).toSec();			//still needs consideration 0.492032
+		last_time = ros::Time::now();
 		delta_x = (vx * cos(th) - vy * sin(th)) * dt;
 		delta_y = (vx * sin(th) + vy * cos(th)) * dt;
 		delta_th = vth * dt;
+		printf("dt is %f, x is %f", dt, x);
 		x += delta_x;
 		y += delta_y;
 		th += delta_th;
@@ -288,11 +288,11 @@ int main(int argc, char **argv)
 	        std::string str(buff);
 	        msg.data = str;
 	        cmd_pub.publish(odom);				//publish info to the "command" topic
-		memset( buff, 0, 512 );
-		
-		ros::spinOnce();					//subscribe info is triggerred in callback
-		loop_rate.sleep();		//0.1s
 		nwrite = write(C.fd, sendbuff, strlen(sendbuff));	//write to st
+		memset( buff, 0, 100 );
+		ros::spinOnce();					//subscribe info is triggerred in callback
+		loop_rate.sleep();		//0.2s
+
 	    }
 	}
 	ROS_INFO("WTF!!");
