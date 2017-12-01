@@ -204,7 +204,7 @@ void Controller::chatterCallback(const geometry_msgs::Twist& vel)
 	sendbuff[temp] = '\r';
 	sendbuff[temp+1] = '\n';
 	sendbuff[temp+2] = '\0';
-	std::cout << "buffer is "<< sendbuff << std::endl;
+	//std::cout << "buffer is "<< sendbuff << std::endl;
 }
 
 int main(int argc, char **argv)
@@ -217,9 +217,9 @@ int main(int argc, char **argv)
         std_msgs::String msg;
 	std::string s;
 
-	double x = 0.0;
-	double y = 0.0;
-	double th = 0.0;
+	float x = 0.0f;
+	float y = 0.0f;
+	float th = 0.0f;
 	double vx = 0.1;
 	double vy = -0.1;
 	double vth = 0.1;
@@ -228,8 +228,6 @@ int main(int argc, char **argv)
 	double delta_y;
 	double delta_th;
 	ros::Time current_time, last_time;
-	current_time = ros::Time::now();
-	last_time = ros::Time::now();
         ros::NodeHandle n;
 	n.param<std::string>("port_name", s, "/dev/ttyACM0");
 	n.param("baud_rate", baud_rate, 115200);
@@ -241,14 +239,14 @@ int main(int argc, char **argv)
 	geometry_msgs::TransformStamped odom_trans;
 	tf::TransformBroadcaster odom_broadcaster;
         ros::Subscriber sub = n.subscribe("cmd_vel", 10, &Controller::chatterCallback,&C);
-        ros::Publisher cmd_pub = n.advertise<std_msgs::String>("command", 10);
+        ros::Publisher cmd_pub = n.advertise<nav_msgs::Odometry>("command", 10);
 	while (ros::ok()) //循环读取数据
 	{
-	    if((nread = read(C.fd, buff, 512))>0)		//read from st
+	    if((nread = read(C.fd, buff, 512))>2)		//read from st
 	    {
 		printf( "%s", buff);
 		current_time = ros::Time::now();
-		sscanf(buff, "%lf, %lf, %lf", &x, &y, &th);					//x, y,th
+		sscanf(buff, "%f, %f, %f", &x, &y, &th);					//x, y,th
 		dt = (current_time - last_time).toSec();			//still needs consideration
 		delta_x = (vx * cos(th) - vy * sin(th)) * dt;
 		delta_y = (vx * sin(th) + vy * cos(th)) * dt;
