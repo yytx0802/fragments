@@ -31,20 +31,23 @@ class Controller{
 	int open_port(int fd,int comport,char* port_name);
 	void chatterCallback(const geometry_msgs::Twist& vel);
 	void connectPort(char* port_name,int baud_rate);
-	explicit Controller(ros::NodeHandle& n){
-		n.param<std::string>("port_name", s, "/dev/ttyACM0");
-		n.param("baud_rate", baud_rate, 115200);
-		strcpy(port_name, s.c_str());
-		connectPort(port_name,baud_rate);
-	}	
-	~Controller(){;}
+	explicit Controller(ros::NodeHandle& n);
+	~Controller();
     protected:
 	ros::NodeHandle m_node;
 	ros::Publisher  m_joint_pub;
 	ros::Subscriber m_joint_sub;
 
 };
-
+Controller::Controller(ros::NodeHandle& n){
+	n.param<std::string>("port_name", s, "/dev/ttyACM0");
+	n.param("baud_rate", baud_rate, 115200);
+	strcpy(port_name, s.c_str());
+	connectPort(port_name,baud_rate);
+}	
+Controller::~Controller(){
+	close(fd);
+}
 int Controller::set_opt(int fd,int nSpeed, int nBits, char nEvent, int nStop)
 {
     struct termios newtio,oldtio;
@@ -304,7 +307,7 @@ int main(int argc, char **argv)
 	    }
 	}
 	ROS_INFO("WTF!!");
-	close(C.fd);
+	//close(C.fd);				//comment it or not?
 	return 0;
 }
 
