@@ -118,10 +118,6 @@ int Controller::set_opt(int fd,int nSpeed, int nBits, char nEvent, int nStop)
 
 switch( nSpeed )
     {
-    case 2400:
-        cfsetispeed(&newtio, B2400);
-        cfsetospeed(&newtio, B2400);
-        break;
     case 4800:
         cfsetispeed(&newtio, B4800);
         cfsetospeed(&newtio, B4800);
@@ -225,8 +221,7 @@ void Controller::connectPort(char* port_name,int baud_rate){
 
 //subscirbe the command and write to driver
 void Controller::chatterCallback(const geometry_msgs::Twist& vel)
-{
-	//printf("write command");	
+{	
 	std::stringstream ss;
 	//ss << "hello world again" << count;
 	ss <<vel.linear.x<<","<<vel.linear.y<<","<<vel.angular.z;
@@ -297,7 +292,6 @@ int main(int argc, char **argv)
         ros::NodeHandle n;
         ros::Rate loop_rate(1);
 	Controller C(n);	
-	//ros::Timer spin_timer = n.createTimer(ros::Duration(0.5),&Controller::spinCallback, &C);
 	ros::spin();			//subscribe info is triggerred in callback
 	//loop_rate.sleep();		//0.1s  CPU 100%	
 	ROS_INFO("WTF!!");
