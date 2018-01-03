@@ -49,9 +49,8 @@ moveBindings = {
 	       }
 
 speedBindings={
-		'q':(1.1,1.1),
-		'z':(.9,.9),
-		'w':(1.1,1),
+		'q':(1.1,1),
+		'z':(.9,1),
 		'x':(.9,1),
 		'e':(1,1.1),
 		'c':(1,.9),
@@ -74,7 +73,7 @@ if __name__=="__main__":
 	pub = rospy.Publisher('cmd_vel', Twist, queue_size = 1)
 	rospy.init_node('keyboard')
 
-	speed = rospy.get_param("~speed", 50)
+	speed = rospy.get_param("~speed", 1)
 	turn = rospy.get_param("~turn", 1.0)
 	x = 0
 	y = 0
