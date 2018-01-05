@@ -228,7 +228,7 @@ void Controller::chatterCallback(const geometry_msgs::Twist& vel)
 {	
 	std::stringstream ss;
 	//ss << "hello world again" << count;
-	ss <<0.0f<<","<<((int)(vel.linear.x * 1000))<<","<<(int)(vel.angular.z * 1000);
+	ss << 0 <<","<< (int)(vel.linear.x * 1000) << "," <<(float)((int)(vel.angular.z * 100)))/100;	//value need changes
 	strcpy(sendbuff, ss.str().c_str());
 	int temp = strlen(sendbuff);
 	sendbuff[temp] = '\r';
