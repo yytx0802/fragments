@@ -43,6 +43,5 @@ add_executable(portread src/portread.cpp)
 target_link_libraries(portread ${catkin_LIBRARIES})
 add_dependencies(portread beginner_tutorials_gencpp)
 
-
 catkin_install_python(PROGRAMS scripts/keyboard
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
