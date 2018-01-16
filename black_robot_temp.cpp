@@ -37,7 +37,7 @@ class Controller{
 	float delta_x;
 	float delta_y;
 	float delta_th;
-	char sendbuff[100] = "z 20 20;\r\n";
+	char sendbuff[100] = "z 20 20\r\n";
 	int set_opt(int fd,int nSpeed, int nBits, char nEvent, int nStop);
 	int open_port(int fd,int comport,char* port_name);
 	void chatterCallback(const geometry_msgs::Twist& vel);
@@ -222,16 +222,17 @@ void Controller::chatterCallback(const geometry_msgs::Twist& vel)
 	int vl, vr;	
 	vl = 106 * vel.linear.x + vel.angular.z * 19;
 	vr = 106 * vel.linear.x - vel.angular.z * 19; 
-	//std::stringstream ss;
+	std::stringstream ss;
 	//ss << "hello world again" << count;
-	//ss << "z "<< 20 << " " << 20 << ";";	
-	//strcpy(sendbuff, ss.str().c_str());
-	//int temp = strlen(sendbuff);
-	//sendbuff[temp] = '\r';
-	//sendbuff[temp+1] = '\n';
-	std::cout << "buffer is "<< sendbuff << std::endl;
+	ss << "z "<< vl << " " << vr << ";";	
+	strcpy(sendbuff, ss.str().c_str());
+	int temp = strlen(sendbuff);
+	sendbuff[temp] = '\r';
+	sendbuff[temp+1] = '\n';
+	//std::cout << vl << " and " << vr << std::endl;
+	std::cout << "buffer is "<< sendbuff   << std::endl;
 	write(fd, sendbuff, strlen(sendbuff));	//write to st
-	//memset(sendbuff, 0, 100 );
+	memset(sendbuff, 0, 100 );
 }
 
 
