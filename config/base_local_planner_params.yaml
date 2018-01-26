@@ -1,0 +1,31 @@
+base_local_planner: dwa_local_planner/DWAPlannerROS
+recovery_behavior_enabled: false
+clearing_rotation_allowed: false
+
+#DWALocalPlannerROS:
+DWAPlannerROS:
+ max_vel_x: 0.25 # 0.45
+ min_vel_x: 0.02 # 0.1
+ max_vel_y: 0.0
+ min_vel_y: 0.0
+ max_vel_theta: 0.2 #  1.0
+ min_vel_theta: 0.0   
+ max_in_place_vel_theta: 0.2
+ acc_lim_theta: 1 #    3.2
+ acc_lim_x: 1 #   2.5
+ acc_lim_y: 0.0 #   2.5
+ holonomic_robot: false
+# publish_traj_pc: true
+ dwa: true
+ meter_scoring: true
+
+
+#gdist_scale: 4.8
+
+#pdist_scale: 0.0
+#gdist_sclae: 4.8
+
+
+#recovery_behavior_enabled: false
+#clearing_rotation_allowed: false
+
