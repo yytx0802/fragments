@@ -372,13 +372,6 @@ class BaseController:
         self.lVelPub = rospy.Publisher('Lvel', Int16, queue_size=5)
         self.rVelPub = rospy.Publisher('Rvel', Int16, queue_size=5)
 
-        self.safe_ranger_0 = 0.3
-        self.safe_ranger_1 = 0.6
-        self.safe_ranger_2 = 1.0
-        self.front_ranger_l = 10.0
-        self.front_ranger_r = 10.0
-
-
     def poll(self):
         #rospy.loginfo("enter poll function!")
         now = rospy.Time.now()
@@ -535,8 +528,7 @@ class BaseController:
 
 class ArduinoROS():
     def __init__(self):
-        rospy.init_node('Arduino', log_level=rospy.DEBUG)
-                
+        rospy.init_node('Arduino', log_level=rospy.DEBUG)            
         # Cleanup when termniating the node
         rospy.on_shutdown(self.shutdown)
         
